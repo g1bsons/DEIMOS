@@ -41,7 +41,7 @@ DEIMOS is a client-side, browser-isolated scheduling engine designed to solve co
 Since DEIMOS requires zero backend dependencies, you can launch it instantly:
 
 - Clone or download this repository:
--     git clone https://github.com/your-username/deimos-scheduler.git
+-     git clone https://github.com/g1bsons/DEIMOS.git
 - Open index.html directly in any modern web browser
 
 2. Workflow Guide
