@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEIMOS - Local Student Scheduling Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="deimos-app-container">
+        <!-- Main Application Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-text">
+                    <h1>DEIMOS</h1>
+                </div>
+            </div>
+
+            <!-- this section is for password protecting your session -->
+            <!-- <div class="security-lock">
+                <label for="app-password">Session Passkey:</label>
+                <div class="input-group">
+                    <input type="password" id="app-password" placeholder="Enter passkey...">
+                    <button id="lock-btn" class="btn btn-secondary">Secure Env</button>
+                </div>
+            </div> -->
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="main-container">
+            <!-- Navigation Sidebar -->
+            <nav class="sidebar">
+                <div class="nav-section-title">Workflow Architecture</div>
+                <button class="nav-tab active" data-target="tab-config">
+                    <span class="step-num">1</span>
+                    <span class="tab-label">Configuration</span>
+                </button>
+                <button class="nav-tab" data-target="tab-import">
+                    <span class="step-num">2</span>
+                    <span class="tab-label">Data Ingestion</span>
+                </button>
+                <button class="nav-tab" data-target="tab-engine">
+                    <span class="step-num">3</span>
+                    <span class="tab-label">Scheduling Engine</span>
+                </button>
+                <button class="nav-tab" data-target="tab-export">
+                    <span class="step-num">4</span>
+                    <span class="tab-label">Export & Previews</span>
+                </button>
+
+                <div class="sidebar-footer">
+                    <div class="shield-icon">🛡️</div>
+                    <p><strong>Privacy Guarantee:</strong> Execution happens strictly inside local RAM memory context.</p>
+                </div>
+            </nav>
+
+            <!-- Main Content Viewport -->
+            <main class="content-viewport">
+                
+                <!-- Section 1: Configuration -->
+                <section id="tab-config" class="tab-panel active">
+                    <div class="panel-header">
+                        <h2>School Day & Structural Design</h2>
+                        <p class="section-desc">Define your structural framework. The engine will automatically generate the scheduling matrix.</p>
+                    </div>
+
+                    <div class="config-grid">
+                        <div class="card">
+                            <h3>Time Matrix</h3>
+                            <div class="form-group">
+                                <label for="day-structure">Day Cycle Template</label>
+                                <select id="day-structure">
+                                    <option value="standard">Standard Daily Repeating (Mon-Fri identical)</option>
+                                    <option value="ab">A / B Alternating Days</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="term-structure">Term Duration</label>
+                                <select id="term-structure">
+                                    <option value="year">Full Academic Year</option>
+                                    <option value="semester">Semester-Based Split (Sem 1 & Sem 2)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="period-count">Periods/Blocks per Day</label>
+                                <input type="number" id="period-count" value="6" min="1" max="10">
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3>Capacity & Constraint Rules</h3>
+                            <div class="form-group">
+                                <label for="max-capacity">Maximum Classroom Capacity</label>
+                                <input type="number" id="max-capacity" value="25" min="5" max="40">
+                                <small>Hard limit. Section enrollment locks when reached.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="sped-weight">SPED / IEP Clustering Priority</label>
+                                <select id="sped-weight">
+                                    <option value="high">High (Strongly group accommodated students)</option>
+                                    <option value="medium" selected>Medium (Balance grouping choices)</option>
+                                    <option value="low">Low (Disperse evenly across classes)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="grade-weight">Grade-Level Cohort Isolation</label>
+                                <select id="grade-weight">
+                                    <option value="strict" selected>Strict (Keep grades entirely separate)</option>
+                                    <option value="flexible">Flexible (Allow mixed electives only)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Data Ingestion -->
+                <section id="tab-import" class="tab-panel">
+                    <div class="panel-header">
+                        <h2>Bulk CSV Ingestion Terminal</h2>
+                        <p class="section-desc">Upload your datasets using clean CSV configurations. Download templates below if you need to structure your data first.</p>
+                    </div>
+
+                    <div class="template-download-bar">
+                        <button id="download-student-tpl" class="btn btn-outline">Download Students Template CSV</button>
+                        <button id="download-course-tpl" class="btn btn-outline">Download Courses/Teachers Template CSV</button>
+                    </div>
+
+                    <div class="import-grid">
+                        <div class="import-card">
+                            <h3>1. Students Dataset</h3>
+                            <p>Upload student names, grade cohorts, SPED designations, and elective choices.</p>
+                            <div class="dropzone" id="dropzone-students">
+                                <input type="file" id="file-students" accept=".csv">
+                                <label for="file-students">
+                                    <span class="upload-icon">📄</span>
+                                    <strong>Choose a CSV file</strong> or drag it here.
+                                </label>
+                            </div>
+                            <div id="status-students" class="status-indicator waiting">Waiting for file upload...</div>
+                        </div>
+
+                        <div class="import-card">
+                            <h3>2. Courses & Teacher Availability Matrix</h3>
+                            <p>Upload courses, grade targets, assigned instructors, and assigned time slots.</p>
+                            <div class="dropzone" id="dropzone-courses">
+                                <input type="file" id="file-courses" accept=".csv">
+                                <label for="file-courses">
+                                    <span class="upload-icon">📊</span>
+                                    <strong>Choose a CSV file</strong> or drag it here.
+                                </label>
+                            </div>
+                            <div id="status-courses" class="status-indicator waiting">Waiting for file upload...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Engine -->
+                <section id="tab-engine" class="tab-panel">
+                    <div class="panel-header">
+                        <h2>Constraint Satisfaction Engine Room</h2>
+                        <p class="section-desc">Run the local mathematical multi-pass compiler to distribute students into classes based on security metrics, cohorts, and constraints.</p>
+                    </div>
+
+                    <div class="engine-control-panel card">
+                        <div class="engine-status-header">
+                            <div class="status-badge-container">
+                                <span class="engine-indicator" id="engine-state-dot"></span>
+                                <strong id="engine-state-text">Ready to Compile</strong>
+                            </div>
+                            <button id="run-engine-btn" class="btn btn-primary btn-large" disabled>Compute & Generate Schedules</button>
+                        </div>
+
+                        <div class="progress-container">
+                            <div id="engine-progress" class="progress-bar">0%</div>
+                        </div>
+
+                        <div class="console-output" id="engine-console">[System Ready] Please import both Students and Courses CSV datasets to unlock processing power...</div>
+                    </div>
+                </section>
+
+                <!-- Section 4: Export -->
+                <section id="tab-export" class="tab-panel">
+                    <div class="panel-header">
+                        <h2>Export Center & Operational Analytics</h2>
+                        <p class="section-desc">Review engine results, resolve anomalies, and download your schedule records instantly.</p>
+                    </div>
+
+                    <div class="export-actions">
+                        <button id="export-master-btn" class="btn btn-primary" disabled>Download Master</button>
+                        <button id="export-students-btn" class="btn btn-secondary" disabled>Download Students</button>
+                        <button id="export-teachers-btn" class="btn btn-secondary" disabled>Download Teachers</button>
+                    </div>
+
+                    <div class="preview-tabs">
+                        <button class="preview-subtab active" data-view="preview-students">Student Schedules View</button>
+                        <button class="preview-subtab" data-view="preview-courses">Course Enrollment View</button>
+                    </div>
+
+                    <div class="table-scroll-container">
+                        <table class="preview-table" id="data-preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Select an action or run engine to view tabular data matrix output...</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>No active runtime datasets compiled yet. Run engine on step 3.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+
+        <!-- Footer Bar -->
+        <footer class="window-statusbar">
+            <div class="status-pane pane-count">Selected Item Count: 1</div>
+            <div class="status-pane pane-path">Context://DEIMOS/SchedulingEngine/Memory_RAM_Sandbox</div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
